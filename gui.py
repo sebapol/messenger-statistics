@@ -128,8 +128,8 @@ def prepareData(chat_members, choose, actionButton):
 
     actionButton['state'] = 'disabled'
     path = chat_members[choose.get()].removesuffix('message_1.json')
-    data = dataPreparation.dataLoader(path)
-    data = dataPreparation.dataFormating(data)
+    data = dataPreparation.loadMessageFilesFromDirectory(path)
+    data = dataPreparation.formatData(data)
     dateFrame = LabelFrame(root, text=f'5: Choose date range for analysis:')
     dateFrame.pack()
     lowerLabel = Label(dateFrame, text='Start date:')

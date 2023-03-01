@@ -4,7 +4,7 @@ from os import listdir
 from os.path import isfile, isdir, join, exists
 import datetime
 
-def dataLoader(path):#loadMessageFilesFromDirectory
+def loadMessageFilesFromDirectory(path):
     '''
     Function loads Facebook .json files from the given path and returns pd.Dataframe object.
     Returned object contains data from .json 'messages' object.
@@ -25,15 +25,14 @@ def dataLoader(path):#loadMessageFilesFromDirectory
     messages = pd.DataFrame()
     #filling dataframe with all json files data from list olyJsonFiles
     for filePath in onlyJsonFiles:
-        with open(filePath, encoding='latin1') as file:
-            file
+        with open(filePath) as file:
             chat_history = json.load(file)
         chat = pd.DataFrame(chat_history['messages'],
                             columns=['sender_name', 'timestamp_ms', 'content'])
         messages = pd.concat([messages, chat], ignore_index=True)
     return messages
 
-def dataFormating(messages):
+def formatData(messages):
     '''
     Function formatting pandas Dataframe object
     :param messages:
@@ -41,12 +40,11 @@ def dataFormating(messages):
     :return:
         pandas Dataframe formatted object with columns=['sender_name', 'timestamp_ms', 'content']
     '''
-    #filling no value cells with 0
     messages.fillna(value={'content': '0'}, inplace=True)
     #decoding messages
-    #messages['content'] = messages['content'].apply(lambda content: content.decode('utf8'))
+    messages['content'] = messages['content'].apply(lambda content: content.encode('latin1').decode('utf8'))
     # decoding names
-    #messages['sender_name'] = messages['sender_name'].apply(lambda name: name.decode('utf8'))
+    messages['sender_name'] = messages['sender_name'].apply(lambda name: name.encode('latin1').decode('utf8'))
     #changing type of sender_name column to category
     messages['sender_name'] = messages['sender_name'].astype('category')
     #creating new datetime column accurate to seconds
@@ -102,13 +100,13 @@ def chatMembers(path):
     # creating dictionary containing chat members and paths to chats
     names = {}
     for filePath in filePaths: #try
-        with open(filePath, encoding='latin1') as file:
+        with open(filePath) as file:
             chat_history = json.load(file)
         # creating dataframe wich contains chat members names
         data = chat_history['title']
         # decoding names
-        #name= data.decode('latin1')
-        names[data] = filePath
+        name = data.encode('latin1').decode('utf8')
+        names[name] = filePath
     return names
 
 def getDatesRange(df):
