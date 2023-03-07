@@ -16,17 +16,17 @@ root.iconbitmap('./icon.ico')
 root.geometry('1080x720')
 
 def hourlyHistogram():
-    analitics.hourlyTextingHistogram(messages)
+    analitics.hourly_texting_histogram(messages)
     plt.show()
     return None
 
 def dailyHistogram():
-    analitics.dailyTextingHistogram(messages)
+    analitics.daily_texting_histogram(messages)
     plt.show()
     return None
 
 def monthlyHistogram():
-    analitics.monthlyTextingHistogram(messages)
+    analitics.monthly_texting_histogram(messages)
     plt.show()
     return None
 
@@ -41,47 +41,47 @@ def prepareAnalysisOptions():
 
     usedWords = Label(analysisFrame, text=f'Most used words:')
     usedWords.grid(row=1, column=0)
-    memberWords = Label(analysisFrame, text=analitics.showMostUsedWords(grouppedMessages, choose.get(), 3, 5), padx=5)
+    memberWords = Label(analysisFrame, text=analitics.give_most_used_words(grouppedMessages, choose.get(), 3, 5), padx=5)
     memberWords.grid(row=1, column=1)
-    member2Words = Label(analysisFrame, text=analitics.showMostUsedWords(grouppedMessages, me, 3, 5), padx=5)
+    member2Words = Label(analysisFrame, text=analitics.give_most_used_words(grouppedMessages, me, 3, 5), padx=5)
     member2Words.grid(row=1, column=2)
 
     maxResponseTime = datetime.timedelta(hours=12)
     usedWords = Label(analysisFrame, text=f'Who texts first:')
     usedWords.grid(row=2, column=0)
-    memberWords = Label(analysisFrame,text=analitics.whoTextFirst(messages, maxResponseTime)[choose.get()], padx=5)
+    memberWords = Label(analysisFrame, text=analitics.who_text_first(messages, maxResponseTime)[choose.get()], padx=5)
     memberWords.grid(row=2, column=1)
-    member2Words = Label(analysisFrame, text=analitics.whoTextFirst(messages, maxResponseTime)[me], padx=5)
+    member2Words = Label(analysisFrame, text=analitics.who_text_first(messages, maxResponseTime)[me], padx=5)
     member2Words.grid(row=2, column=2)
 
     usedWords = Label(analysisFrame, text=f'Average message length:')
     usedWords.grid(row=3, column=0)
     memberWords = Label(analysisFrame,
-                        text=analitics.averageMessageLength(grouppedMessages, choose.get()), padx=5)
+                        text=analitics.average_message_length(grouppedMessages, choose.get()), padx=5)
     memberWords.grid(row=3, column=1)
-    member2Words = Label(analysisFrame, text=analitics.averageMessageLength(grouppedMessages, me), padx=5)
+    member2Words = Label(analysisFrame, text=analitics.average_message_length(grouppedMessages, me), padx=5)
     member2Words.grid(row=3, column=2)
 
-    myResponse = analitics.responseTimes(messages, me, maxResponseTime)
-    memberResponse = analitics.responseTimes(messages, choose.get(), maxResponseTime)
+    myResponse = analitics.response_times(messages, me, maxResponseTime)
+    memberResponse = analitics.response_times(messages, choose.get(), maxResponseTime)
 
     usedWords = Label(analysisFrame, text=f'Average response time:')
     usedWords.grid(row=4, column=0)
     memberWords = Label(analysisFrame,
-                        text=analitics.averageResponseTime(memberResponse), padx=5)
+                        text=analitics.average_response_time(memberResponse), padx=5)
     memberWords.grid(row=4, column=1)
     member2Words = Label(analysisFrame,
-                         text=analitics.averageResponseTime(myResponse), padx=5)
+                         text=analitics.average_response_time(myResponse), padx=5)
     member2Words.grid(row=4, column=2)
 
     usedWords = Label(analysisFrame, text=f'Median of response time:')
     usedWords.grid(row=5, column=0)
     memberWords = Label(analysisFrame,
-                        text=analitics.medianResponseTime(memberResponse),
+                        text=analitics.median_response_time(memberResponse),
                         padx=5)
     memberWords.grid(row=5, column=1)
     member2Words = Label(analysisFrame,
-                         text=analitics.medianResponseTime(myResponse), padx=5)
+                         text=analitics.median_response_time(myResponse), padx=5)
     member2Words.grid(row=5, column=2)
 
     usedWords = Label(analysisFrame, text=f'Number of messages:')
@@ -121,15 +121,15 @@ def prepareData(chat_members, choose, actionButton):
         lowerLabel['text'] = f'End date: {endDate.date()}'
         dateMenu.destroy()
         acceptDateButton.destroy()
-        messages = dataPreparation.filterDataByDate(data, startDate, endDate)
-        grouppedMessages = dataPreparation.groupDataByUsers(messages)
+        messages = dataPreparation.filter_data_by_date(data, startDate, endDate)
+        grouppedMessages = dataPreparation.group_data_by_users(messages)
         prepareAnalysisOptions()
         return None
 
     actionButton['state'] = 'disabled'
     path = chat_members[choose.get()].removesuffix('message_1.json')
     data = dataPreparation.loadMessageFilesFromDirectory(path)
-    data = dataPreparation.formatData(data)
+    data = dataPreparation.format_data(data)
     dateFrame = LabelFrame(root, text=f'5: Choose date range for analysis:')
     dateFrame.pack()
     lowerLabel = Label(dateFrame, text='Start date:')
@@ -148,7 +148,7 @@ def setData():
     global choose
     #global actionButton
     acceptButton['state'] = 'disabled'
-    chat_members = dataPreparation.giveChatMembers(filepath)
+    chat_members = dataPreparation.give_chat_members(filepath)
     memberFrame = LabelFrame(root, text=f'4: Choose a chat member:')
     memberFrame.pack()
     choose = StringVar()
