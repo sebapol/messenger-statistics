@@ -12,7 +12,7 @@ def time_to_seconds(time):
     return time.second + time.minute * 60 + time.hour * 60 * 60
 
 
-def mean_texting_hour(data, column_name):  # TODO: zmienić sygnaturę funkcji(data, column_name)
+def mean_texting_hour(data, column_name):
     """
     returns mean texting hours from pandas dataframe object df
     :param data:
@@ -23,7 +23,7 @@ def mean_texting_hour(data, column_name):  # TODO: zmienić sygnaturę funkcji(d
         datetime.timedelta object
     """
 
-    time = data[column_name].apply(func=time_to_seconds)  # TODO: time = data[column_name].apply(func=timeToSeconds)
+    time = data[column_name].apply(func=time_to_seconds)
     mean_time = time.mean()
     return datetime.timedelta(seconds=mean_time)
 
