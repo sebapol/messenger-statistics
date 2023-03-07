@@ -121,8 +121,8 @@ def prepareData(chat_members, choose, actionButton):
         lowerLabel['text'] = f'End date: {endDate.date()}'
         dateMenu.destroy()
         acceptDateButton.destroy()
-        messages = dataPreparation.dateFiltering(data, startDate, endDate)
-        grouppedMessages = dataPreparation.groupingByUsers(messages)
+        messages = dataPreparation.filterDataByDate(data, startDate, endDate)
+        grouppedMessages = dataPreparation.groupDataByUsers(messages)
         prepareAnalysisOptions()
         return None
 
@@ -148,7 +148,7 @@ def setData():
     global choose
     #global actionButton
     acceptButton['state'] = 'disabled'
-    chat_members = dataPreparation.chatMembers(filepath)
+    chat_members = dataPreparation.giveChatMembers(filepath)
     memberFrame = LabelFrame(root, text=f'4: Choose a chat member:')
     memberFrame.pack()
     choose = StringVar()
