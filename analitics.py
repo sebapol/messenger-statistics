@@ -189,15 +189,6 @@ def average_message_length(grouped_df, sender_name):
     return mean
 
 
-def count_messages(grouped_df, frequency, sender_name):  # YAGNI niepotrzebna funkcja
-    pos_freq = ['min', 'H', 'D', 'M', 'Y']
-    if frequency not in pos_freq:
-        raise Exception(f'Wrong frequency! Allowed: {pos_freq}')
-    data = grouped_df.get_group(sender_name)
-    data = data[['sender_name', 'DateTime']].set_index('DateTime')
-    return data.resample(frequency).count()
-
-
 def count_words(grouped_df, sender_name, min_word_length):
     """
     Counts times of appearance of every word in all messages of sender
@@ -233,7 +224,7 @@ def most_used_words(words_counts, number_of_words=1):
     :param words_counts:
         (Dict[str, int]) dictionary - word : times word appeared
     :param number_of_words:
-        (int) number of words wich have to be returned
+        (int) number of words which have to be returned
     :return:
         (List[(int,str)]) list of tuples that contains number of appearances (int) and word (str)
     """
@@ -256,7 +247,7 @@ def give_most_used_words(grouped_df, sender_name, min_word_length, number_of_wor
     :param min_word_length:
         (int) minimal length of word
     :param number_of_words:
-        (int) number of words wich have to be returned
+        (int) number of words which have to be returned
     :return:
         (List[(int,str)]) list of tuples that contains number of appearances (int) and word (str)
     """
