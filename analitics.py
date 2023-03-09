@@ -198,31 +198,6 @@ def count_messages(grouped_df, frequency, sender_name):  # YAGNI niepotrzebna fu
     return data.resample(frequency).count()
 
 
-def average_message_length(grouped_df, sender_name):
-    """
-    Counts average message length of given sender
-
-    :param grouped_df:
-        (pandas.groupby) object that contains information about the senders
-    :param sender_name:
-        (str) name of sender
-    :return:
-        (int) average message length of sender
-    """
-    data = grouped_df.get_group(sender_name)
-    mean = data['content'].apply(lambda x: len(x)).mean()
-    return mean
-
-
-def count_messages(grouped_df, frequency, sender_name):  # YAGNI niepotrzebna funkcja
-    pos_freq = ['min', 'H', 'D', 'M', 'Y']
-    if frequency not in pos_freq:
-        raise Exception(f'Wrong frequency! Allowed: {pos_freq}')
-    data = grouped_df.get_group(sender_name)
-    data = data[['sender_name', 'DateTime']].set_index('DateTime')
-    return data.resample(frequency).count()
-
-
 def count_words(grouped_df, sender_name, min_word_length):
     """
     Counts times of appearance of every word in all messages of sender
