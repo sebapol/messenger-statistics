@@ -22,7 +22,7 @@ def load_message_file_from_directory(path):
     :param path:
         (str) path to folder where are .json Facebook files with 'messages' object
     :return:
-        pandas Dataframe object with columns=['sender_name', 'timestamp_ms', 'content']
+        (pandas.Dataframe) object with columns=['sender_name', 'timestamp_ms', 'content']
     :exception DirectoryException:
         exception raised when given path do not exist
     """
@@ -32,7 +32,7 @@ def load_message_file_from_directory(path):
     # creating list containing paths to json files in path
     only_json_files = [join(path, f) for f in listdir(path) if (isfile(join(path, f)) and
                                                                 f.startswith('message') and
-                                                                f.endswith('.json'))]  # funkcja glob()
+                                                                f.endswith('.json'))]
     # creating empty data frame
     messages = pd.DataFrame()
     # filling dataframe with all json files data from list olyJsonFiles
@@ -48,10 +48,11 @@ def load_message_file_from_directory(path):
 def format_data(messages):
     """
     Function formatting pandas Dataframe object
+
     :param messages:
-        pandas Dataframe object with columns=['sender_name', 'timestamp_ms', 'content']
+        (pandas.Dataframe) object with columns=['sender_name', 'timestamp_ms', 'content']
     :return:
-        pandas Dataframe formatted object with columns=['sender_name', 'timestamp_ms', 'content']
+        (pandas.Dataframe) formatted object with columns=['sender_name', 'timestamp_ms', 'content']
     """
     messages.fillna(value={'content': '0'}, inplace=True)
     # decoding messages
@@ -73,10 +74,11 @@ def format_data(messages):
 def group_data_by_users(df):
     """
     Groups pd.Dataframe object df by sender_name column values
+
     :param df:
-         pd.Dataframe object with sender_name column
+         (pandas.Dataframe) object with sender_name column
     :return:
-         Pandas groupby object that contains information about the groups
+         (pandas.groupby) object that contains information about the groups
     """
     user_group = df.groupby(by='sender_name')
     return user_group
@@ -84,56 +86,70 @@ def group_data_by_users(df):
 
 def filter_data_by_date(data, start_date, end_date):
     """
-    Filters pd.Dataframe object df by dates: from startDate to endDate
+    Filters pd.Dataframe object data by dates: from start_date to end_date
+
     :param data:
-        pd.Dataframe object
+        (pandas.Dataframe) object
     :param start_date:
         datetime.datetime object
     :param end_date:
         datetime.datetime object
     :return:
-        pd.Dataframe object df by dates
+        (pandas.Dataframe) object df by dates
     :exception ValueError:
         exception raised when start date is later than end date
     :exception KeyError:
         exception raised when there is no messages between start and end date
     """
+    # including messages sent till end of the end_date day
     end_date = end_date + datetime.timedelta(hours=23, minutes=59, seconds=59)
     if start_date > end_date:
         raise ValueError('Start date later than end date!')
     data = data[(data['DateTime'] >= start_date) & (data['DateTime'] <= end_date)]
     if len(data) == 0:
-        raise KeyError('No messages between {startDate} and {endDate}!')  # todo: uodpornic inne funkcje
+        raise KeyError('No messages between {startDate} and {endDate}!')
     return data
 
 
 def give_chat_members(path):
+    """
+    Returns dictionary with all chats members and paths to its .json files
+
+    :param path:
+        (str) path to folder where are Facebook message folder
+    :return:
+        (dict) dictionary with chats members names as keys and path to each chat .json file as values
+    """
     mypath = join(path, 'messages/inbox')
     # checking if path exists
     if not exists(mypath):
         raise DirectoryException(mypath)
     # creating list containing paths to .json chat file of each member
-    file_paths = [join(mypath, f, 'message_1.json') for f in listdir(mypath) if (isdir(join(mypath, f)))]
+    file_paths = [join(mypath, f, 'message_1.json') for f in listdir(mypath) if isdir(join(mypath, f))]
     # creating dictionary containing chat members and paths to chats
     names = {}
     for file_path in file_paths:  # try
         with open(file_path) as file:
             chat_history = json.load(file)
-        # creating dataframe wich contains chat members names
-        data = chat_history['title']
+        name_data = chat_history['title']
         # decoding names
-        name = data.encode('latin1').decode('utf8')
+        name = name_data.encode('latin1').decode('utf8')
         names[name] = file_path
     return names
 
 
 def get_dates_range(df):
+    """
+    Returns dates range, from first to last day when there was texting
+
+    :param df:
+        (pandas.Dataframe) object with 'DateTime' column
+    :return:
+        datetime.timedelta object
+    """
     minimum = df['DateTime'].min()
-    print('min=', minimum)
     maximum = df['DateTime'].max()
-    print('max=', maximum)
     step = maximum - minimum
     step = step.days
-    print('days=', step)
     dates_range = [(minimum + datetime.timedelta(days=x)).date() for x in range(step)]
     return dates_range

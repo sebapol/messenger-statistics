@@ -41,9 +41,9 @@ def prepareAnalysisOptions():
 
     usedWords = Label(analysisFrame, text=f'Most used words:')
     usedWords.grid(row=1, column=0)
-    memberWords = Label(analysisFrame, text=analitics.give_most_used_words(grouppedMessages, choose.get(), 3, 5), padx=5)
+    memberWords = Label(analysisFrame, text=analitics.give_most_used_words(grouppedMessages, choose.get(), 5, 5), padx=5)
     memberWords.grid(row=1, column=1)
-    member2Words = Label(analysisFrame, text=analitics.give_most_used_words(grouppedMessages, me, 3, 5), padx=5)
+    member2Words = Label(analysisFrame, text=analitics.give_most_used_words(grouppedMessages, me, 5, 5), padx=5)
     member2Words.grid(row=1, column=2)
 
     maxResponseTime = datetime.timedelta(hours=12)
@@ -121,14 +121,14 @@ def prepareData(chat_members, choose, actionButton):
         lowerLabel['text'] = f'End date: {endDate.date()}'
         dateMenu.destroy()
         acceptDateButton.destroy()
-        messages = dataPreparation.filter_data_by_date(data, startDate, endDate)
+        messages = dataPreparation.filter_data_by_date(data, startDate, endDate) # todo: add exceptions handling
         grouppedMessages = dataPreparation.group_data_by_users(messages)
         prepareAnalysisOptions()
         return None
 
     actionButton['state'] = 'disabled'
     path = chat_members[choose.get()].removesuffix('message_1.json')
-    data = dataPreparation.loadMessageFilesFromDirectory(path)
+    data = dataPreparation.load_message_file_from_directory(path)
     data = dataPreparation.format_data(data)
     dateFrame = LabelFrame(root, text=f'5: Choose date range for analysis:')
     dateFrame.pack()
