@@ -52,7 +52,8 @@ def format_data(messages):
     :param messages:
         (pandas.Dataframe) object with columns=['sender_name', 'timestamp_ms', 'content']
     :return:
-        (pandas.Dataframe) formatted object with columns=['sender_name', 'timestamp_ms', 'content']
+        (pandas.Dataframe) formatted object with columns=['sender_name', 'timestamp_ms', 'content', 'DateTime',
+                                                          'response_time', 'is_response']
     """
     messages.fillna(value={'content': '0'}, inplace=True)
     # decoding messages
@@ -61,13 +62,12 @@ def format_data(messages):
     messages['sender_name'] = messages['sender_name'].apply(lambda name: name.encode('latin1').decode('utf8'))
     # changing type of sender_name column to category
     messages['sender_name'] = messages['sender_name'].astype('category')
-    # creating new datetime column accurate to seconds
     messages['DateTime'] = pd.to_datetime(messages['timestamp_ms'], unit='ms').dt.ceil(freq='s')  # date_time
     # sorting by date from older to newer
     messages.sort_values('DateTime', inplace=True)
-    # resetting index
     messages.reset_index(inplace=True)
-
+    messages['response_time'] = messages['DateTime'].diff()
+    messages['is_response'] = messages['sender_name'].shift(periods=1) != messages['sender_name']
     return messages
 
 
