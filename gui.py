@@ -1,11 +1,12 @@
 import tkinter
+import tkinter.filedialog
+import tkinter.messagebox
 from tkcalendar import Calendar
 import datetime
 import matplotlib.pyplot as plt
 
 import analitics
 import dataPreparation
-
 
 def hourly_histogram():
     analitics.hourly_texting_histogram(messages)
@@ -132,7 +133,6 @@ def set_response_time(parent_label_name, members, col, row, glob, loc):
             create_response_times_label(parent_label_name, members, col, row, glob, loc)
             create_who_text_first_label(parent_label_name, members, col + 2, row, glob, loc)
             time_window.destroy()
-
         return None
 
     time_window = tkinter.Toplevel()
@@ -316,25 +316,35 @@ def prepare_data(chat_members, choose, action_button, membersMenu):
 
 
 def setData():
-    # global chat_members
+    def check_choose():
+        if choose.get():
+            prepare_data(chat_members, choose, actionButton, membersMenu)
+        else:
+            tkinter.messagebox.showwarning('No chat member chosen', 'First you have to choose chat member!')
+        return None
+
+    try:
+        chat_members = dataPreparation.give_chat_members(filepath)
+    except dataPreparation.DirectoryException:
+        tkinter.messagebox.showerror('Filepath error', 'Wrong file path!\nChoose proper file path.')
+        directoryClick()
+        return None
+
     global choose
-    # global actionButton
     acceptButton['state'] = 'disabled'
     directoryButton['state'] = 'disabled'
-    chat_members = dataPreparation.give_chat_members(filepath)
     memberFrame = tkinter.LabelFrame(root, text=f'4: Choose a chat member:')
     memberFrame.pack()
     choose = tkinter.StringVar()
     membersMenu = tkinter.OptionMenu(memberFrame, choose, *chat_members.keys())
     membersMenu.pack()
-    actionButton = tkinter.Button(memberFrame,
-                                  text='Accept selection',
-                                  command=lambda: prepare_data(chat_members, choose, actionButton, membersMenu))
+    actionButton = tkinter.Button(memberFrame, text='Accept selection', command=check_choose)
     actionButton.pack()
     return None
 
 
 def directoryClick():
+    global filepath
     try:
         filepath = tkinter.filedialog.askdirectory(initialdir=open('._lastdir').read(), title='Select a directory')
     except:
@@ -352,15 +362,11 @@ if __name__ == "__main__":
     root.iconbitmap('./icon.ico')
     root.geometry('1366x768')
 
-    global filepath
-
     txt = 'Welcome in Messenger Analyzer\n\nAnalyze your Messenger data:\n\n1. Get your Faacebook data: ' \
           'https://www.facebook.com/help/212802592074644/?helpref=uf_share\n' \
           '   Pay attention to chose .json file format\n\n' \
           '2. Unzip your downloaded data\n'
-
     titleLabel = tkinter.Label(root, text=txt)
-
     directoryFrame = tkinter.LabelFrame(root, text='3: Choose a directory to your unzipped data:')
     directoryButton = tkinter.Button(directoryFrame, text='Choose directory', command=directoryClick)
     filepathFrame = tkinter.LabelFrame(directoryFrame, text=f'Chosen directory:')
