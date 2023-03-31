@@ -5,23 +5,24 @@ from tkcalendar import Calendar
 import datetime
 import matplotlib.pyplot as plt
 
-import analitics
+import analytics
 import dataPreparation
 
+
 def hourly_histogram():
-    analitics.hourly_texting_histogram(messages)
+    analytics.hourly_texting_histogram(messages)
     plt.show()
     return None
 
 
 def daily_histogram():
-    analitics.daily_texting_histogram(messages)
+    analytics.daily_texting_histogram(messages)
     plt.show()
     return None
 
 
 def monthly_histogram():
-    analitics.monthly_texting_histogram(messages)
+    analytics.monthly_texting_histogram(messages)
     plt.show()
     return None
 
@@ -37,13 +38,13 @@ def create_members_labels(parent_label_name, members, column, row, glob, loc):
 
 
 def create_most_used_words_label(parent_label_name, members, column, row, glob, loc):
-    exec_txt = f"used_words = tkinter.Label({parent_label_name}, text='Most used words:')\n" \
-               f"used_words.grid(row={row}, column={column})\n"
+    exec_txt = f"used_words_head = tkinter.Label({parent_label_name}, text='Most used words:')\n" \
+               f"used_words_head.grid(row={row}, column={column})\n"
     for i, f in members:
-        exec_txt += f"member{i}_words = tkinter.Label({parent_label_name}, " \
-                    f"text=analitics.give_most_used_words(grouppedMessages, " \
+        exec_txt += f"member{i}_used_words = tkinter.Label({parent_label_name}, " \
+                    f"text=analytics.give_most_used_words(grouped_messages, " \
                     f"'{f}', min_word_length, words_amount), padx=5)\n" \
-                    f"member{i}_words.grid(row={row + i + 1}, column={column})\n"
+                    f"member{i}_used_words.grid(row={row + i + 1}, column={column})\n"
     exec(exec_txt, glob, loc)
     return None
 
@@ -51,7 +52,7 @@ def create_most_used_words_label(parent_label_name, members, column, row, glob, 
 def create_who_text_first_label(parent_label_name, members, column, row, glob, loc):
     exec_txt = f"used_words = tkinter.Label({parent_label_name}, text=f'Who texts first:')\n" \
                f"used_words.grid(row={row}, column={column})\n" \
-               f"first_text = analitics.who_text_first(messages, max_response_time)\n"
+               f"first_text = analytics.who_text_first(messages, max_response_time)\n"
     for i, f in members:
         exec_txt += f"member{i}_words = tkinter.Label({parent_label_name}," \
                     f"text=first_text['{f}'], padx=5)\n" \
@@ -65,7 +66,7 @@ def create_avg_message_len_label(parent_label_name, members, column, row, glob, 
                f"used_words.grid(row={row}, column={column})\n"
     for i, f in members:
         exec_txt += f"member{i}_words = tkinter.Label(analysis_frame, " \
-                    f"text=round(analitics.average_message_length(grouppedMessages, '{f}'), 2), padx=5)\n" \
+                    f"text=round(analytics.average_message_length(grouped_messages, '{f}'), 2), padx=5)\n" \
                     f"member{i}_words.grid(row={row + i + 1}, column={column})\n"
     exec(exec_txt, glob, loc)
     return None
@@ -76,13 +77,13 @@ def create_response_times_label(parent_label_name, members, column, row, glob, l
                f"avg_words.grid(row={row}, column={column})\n" \
                f"median_words = tkinter.Label(analysis_frame, text=f'Median of response time:')\n" \
                f"median_words.grid(row={row}, column={column + 1})\n" \
-               f"members_response = analitics.response_times(messages, max_response_time)\n"
+               f"members_response = analytics.response_times(messages, max_response_time)\n"
     for i, f in members:
         exec_txt += f"member{i}_avg = tkinter.Label({parent_label_name}, " \
-                    f"text=analitics.average_response_time(members_response, '{f}'), padx=5)\n" \
+                    f"text=analytics.average_response_time(members_response, '{f}'), padx=5)\n" \
                     f"member{i}_avg.grid(row={row + i + 1}, column={column})\n" \
                     f"member{i}_median = tkinter.Label({parent_label_name}, " \
-                    f"text=analitics.median_response_time(members_response, '{f}'), padx=5)\n" \
+                    f"text=analytics.median_response_time(members_response, '{f}'), padx=5)\n" \
                     f"member{i}_median.grid(row={row + i + 1}, column={column + 1})\n"
     exec(exec_txt, glob, loc)
     return None
@@ -93,7 +94,7 @@ def create_message_number_label(parent_label_name, members, column, row, glob, l
                f"used_words.grid(row={row}, column={column})\n"
     for i, f in members:
         exec_txt += f"member{i}_words = tkinter.Label({parent_label_name}, " \
-                    f"text=len(grouppedMessages.get_group('{f}')), padx=5)\n" \
+                    f"text=len(grouped_messages.get_group('{f}')), padx=5)\n" \
                     f"member{i}_words.grid(row={row + i + 1}, column={column})\n"
     exec(exec_txt, glob, loc)
     return None
@@ -107,7 +108,7 @@ def set_response_time(parent_label_name, members, col, row, glob, loc):
             assert days >= 0
             days_entry.configure(background='white')
             d_flag = True
-        except:
+        except (AssertionError, ValueError):
             days_entry.configure(background='red')
             d_flag = False
             err_label.grid(row=2, column=0, columnspan=4)
@@ -116,14 +117,14 @@ def set_response_time(parent_label_name, members, col, row, glob, loc):
             assert hours >= 0
             hours_entry.configure(background='white')
             h_flag = True
-        except:
+        except (AssertionError, ValueError):
             hours_entry.configure(background='red')
             h_flag = False
             err_label.grid(row=2, column=0, columnspan=4)
         try:
             assert any([days > 0, hours > 0])
             a_flag = True
-        except:
+        except (AssertionError, UnboundLocalError):
             err_label2 = tkinter.Label(time_window, text='At least one value must be bigger than 0!', fg='red')
             err_label2.grid(row=3, column=0, columnspan=4)
             a_flag = False
@@ -149,7 +150,7 @@ def set_response_time(parent_label_name, members, col, row, glob, loc):
     accept_response_button = tkinter.Button(time_window, text='Set response time', command=accept_response_time)
 
     days_entry.insert(0, loc['max_response_time'].days)
-    hours_entry.insert(0, loc['max_response_time'].seconds / 3600)
+    hours_entry.insert(0, round(loc['max_response_time'].seconds / 3600))
     text_label.grid(row=0, column=0, columnspan=5)
     days_label.grid(row=1, column=0)
     hours_label.grid(row=1, column=2)
@@ -164,7 +165,7 @@ def set_response_time(parent_label_name, members, col, row, glob, loc):
 def clean_column(members, glob, loc):
     exec_txt = ''
     for i, _ in members:
-        exec_txt += f"member{i}_words.destroy()\n"
+        exec_txt += f"member{i}_used_words.destroy()\n"
     exec(exec_txt, glob, loc)
 
 
@@ -176,7 +177,7 @@ def set_most_used_words(parent_label_name, members, col, row, glob, loc):
             assert length > 0
             length_entry.configure(background='white')
             l_flag = True
-        except:
+        except (AssertionError, ValueError):
             length_entry.configure(background='red')
             l_flag = False
             err_label.grid(row=2, column=0, columnspan=6)
@@ -185,7 +186,7 @@ def set_most_used_words(parent_label_name, members, col, row, glob, loc):
             assert amount > 0
             amount_entry.configure(background='white')
             a_flag = True
-        except:
+        except (AssertionError, ValueError):
             amount_entry.configure(background='red')
             a_flag = False
             err_label.grid(row=2, column=0, columnspan=4)
@@ -196,6 +197,7 @@ def set_most_used_words(parent_label_name, members, col, row, glob, loc):
             clean_column(members, glob, loc)
             create_most_used_words_label(parent_label_name, members, col, row, glob, loc)
             time_window.destroy()
+        return None
 
     time_window = tkinter.Toplevel()
     time_window.title('Set most used words options')
@@ -225,9 +227,8 @@ def prepare_analysis_options():
     analysis_frame = tkinter.LabelFrame(root, text=f'6: Analysis:')
     analysis_frame.pack()
     parent_label_name = 'analysis_frame'
-    members = list(enumerate(grouppedMessages.groups))
+    members = list(enumerate(grouped_messages.groups))
 
-    # todo: zapytać o ilość słów i ich długość
     min_word_length = 4
     words_amount = 5
     max_response_time = datetime.timedelta(hours=12)
@@ -269,56 +270,61 @@ def prepare_analysis_options():
     return None
 
 
-def prepare_data(chat_members, choose, action_button, membersMenu):
+def prepare_data(chat_members, choose, action_button, members_menu):
     def accept_start_date():
-        global startDate
-        startDate = dateMenu.get_date()
-        startDate = datetime.datetime.strptime(startDate, '%m/%d/%y')
-        lowerLabel['text'] = 'End date:'
-        dateMenu.selection_set(maximum)
-        upperLabel = tkinter.Label(dateFrame, text=f'Start date: {startDate.date()}')
-        upperLabel.grid(row=0, column=0)
-        acceptDateButton.configure(command=acceptEndDate)
+        global start_date
+        start_date = date_menu.get_date()
+        start_date = datetime.datetime.strptime(start_date, '%m/%d/%y')
+        lower_label['text'] = 'End date:'
+        date_menu.selection_set(maximum)
+        upper_label = tkinter.Label(date_frame, text=f'Start date: {start_date.date()}')
+        upper_label.grid(row=0, column=0)
+        accept_date_button.configure(command=accept_end_date)
         return None
 
-    def acceptEndDate():
+    def accept_end_date():
         global messages
-        global grouppedMessages
-        endDate = dateMenu.get_date()
-        endDate = datetime.datetime.strptime(endDate, '%m/%d/%y')
-        lowerLabel['text'] = f'End date: {endDate.date()}'
-        dateMenu.destroy()
-        acceptDateButton.destroy()
-        messages = dataPreparation.filter_data_by_date(data, startDate, endDate)  # todo: add exceptions handling
-        grouppedMessages = dataPreparation.group_data_by_users(messages)
-        prepare_analysis_options()
+        global grouped_messages
+        end_date = date_menu.get_date()
+        end_date = datetime.datetime.strptime(end_date, '%m/%d/%y')
+        lower_label['text'] = f'End date: {end_date.date()}'
+        date_menu.destroy()
+        accept_date_button.destroy()
+        try:
+            messages = dataPreparation.filter_data_by_date(data, start_date, end_date)
+            grouped_messages = dataPreparation.group_data_by_users(messages)
+            prepare_analysis_options()
+        except (ValueError, KeyError) as e:
+            date_frame.destroy()
+            tkinter.messagebox.showerror('Wrong date range!', f'{e}\n\nSet different time range')
+            prepare_data(chat_members, choose, action_button, members_menu)
         return None
 
     action_button['state'] = 'disabled'
-    membersMenu['state'] = 'disabled'
+    members_menu['state'] = 'disabled'
     path = chat_members[choose.get()].removesuffix('message_1.json')
     data = dataPreparation.load_message_file_from_directory(path)
     data = dataPreparation.format_data(data)
     minimum = data['DateTime'].min()
     maximum = data['DateTime'].max()
 
-    dateFrame = tkinter.LabelFrame(root, text=f'5: Choose date range for analysis:')
-    dateFrame.pack()
-    lowerLabel = tkinter.Label(dateFrame, text='Start date:')
-    lowerLabel.grid(row=1, column=0)
+    date_frame = tkinter.LabelFrame(root, text=f'5: Choose date range for analysis:')
+    date_frame.pack()
+    lower_label = tkinter.Label(date_frame, text='Start date:')
+    lower_label.grid(row=1, column=0)
 
-    dateMenu = Calendar(dateFrame, selectmode='day', mindate=minimum, maxdate=maximum,
-                        year=minimum.year, month=minimum.month, day=minimum.day)
-    dateMenu.grid(row=1, column=1)
-    acceptDateButton = tkinter.Button(dateFrame, text='Accept date', command=accept_start_date)
-    acceptDateButton.grid(row=1, column=2)
+    date_menu = Calendar(date_frame, selectmode='day', mindate=minimum, maxdate=maximum,
+                         year=minimum.year, month=minimum.month, day=minimum.day)
+    date_menu.grid(row=1, column=1)
+    accept_date_button = tkinter.Button(date_frame, text='Accept date', command=accept_start_date)
+    accept_date_button.grid(row=1, column=2)
     return None
 
 
-def setData():
+def set_data():
     def check_choose():
-        if choose.get():
-            prepare_data(chat_members, choose, actionButton, membersMenu)
+        if choice.get():
+            prepare_data(chat_members, choice, action_button, members_menu)
         else:
             tkinter.messagebox.showwarning('No chat member chosen', 'First you have to choose chat member!')
         return None
@@ -327,23 +333,23 @@ def setData():
         chat_members = dataPreparation.give_chat_members(filepath)
     except dataPreparation.DirectoryException:
         tkinter.messagebox.showerror('Filepath error', 'Wrong file path!\nChoose proper file path.')
-        directoryClick()
+        directory_click()
         return None
 
-    global choose
+    global choice
     acceptButton['state'] = 'disabled'
     directoryButton['state'] = 'disabled'
-    memberFrame = tkinter.LabelFrame(root, text=f'4: Choose a chat member:')
-    memberFrame.pack()
-    choose = tkinter.StringVar()
-    membersMenu = tkinter.OptionMenu(memberFrame, choose, *chat_members.keys())
-    membersMenu.pack()
-    actionButton = tkinter.Button(memberFrame, text='Accept selection', command=check_choose)
-    actionButton.pack()
+    member_frame = tkinter.LabelFrame(root, text=f'4: Choose a chat member:')
+    member_frame.pack()
+    choice = tkinter.StringVar()
+    members_menu = tkinter.OptionMenu(member_frame, choice, *chat_members.keys())
+    members_menu.pack()
+    action_button = tkinter.Button(member_frame, text='Accept selection', command=check_choose)
+    action_button.pack()
     return None
 
 
-def directoryClick():
+def directory_click():
     global filepath
     try:
         filepath = tkinter.filedialog.askdirectory(initialdir=open('._lastdir').read(), title='Select a directory')
@@ -368,10 +374,10 @@ if __name__ == "__main__":
           '2. Unzip your downloaded data\n'
     titleLabel = tkinter.Label(root, text=txt)
     directoryFrame = tkinter.LabelFrame(root, text='3: Choose a directory to your unzipped data:')
-    directoryButton = tkinter.Button(directoryFrame, text='Choose directory', command=directoryClick)
+    directoryButton = tkinter.Button(directoryFrame, text='Choose directory', command=directory_click)
     filepathFrame = tkinter.LabelFrame(directoryFrame, text=f'Chosen directory:')
     filepathLabel = tkinter.Label(filepathFrame, text='')
-    acceptButton = tkinter.Button(directoryFrame, text='Accept directory', command=setData)
+    acceptButton = tkinter.Button(directoryFrame, text='Accept directory', command=set_data)
 
     try:
         filepath = open('._lastdir').read()

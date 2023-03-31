@@ -107,7 +107,7 @@ def filter_data_by_date(data, start_date, end_date):
         raise ValueError('Start date later than end date!')
     data = data[(data['DateTime'] >= start_date) & (data['DateTime'] <= end_date)]
     if len(data) == 0:
-        raise KeyError('No messages between {startDate} and {endDate}!')
+        raise KeyError(f'No messages between {start_date} and {end_date}!')
     return data
 
 
